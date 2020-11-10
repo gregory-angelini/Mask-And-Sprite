@@ -12,6 +12,11 @@ public class ShapeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
         shapeView = GetComponent<ShapeView>();
     }
 
+    public void MoveTo(Vector3 target, float duration, bool isLocal = true)
+    {
+        iTween.MoveTo(gameObject, iTween.Hash("x", target.x, "y", target.y, "islocal", isLocal, "easeType", "easeOutCirc", "time", duration));
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.clickCount == 2)

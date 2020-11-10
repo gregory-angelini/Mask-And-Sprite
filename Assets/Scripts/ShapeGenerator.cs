@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using UnityEngine.Rendering;
 
 public class ShapeGenerator : MonoBehaviour
 {
@@ -22,8 +22,11 @@ public class ShapeGenerator : MonoBehaviour
 
         shape.GetComponent<MeshRenderer>().material = material;
         shape.transform.localScale = new Vector3(shapeScale, shapeScale, shapeScale);
+        shape.transform.localPosition = new Vector3(0, 0, -1);
 
-        CreateCube();
+        CreateHex();
+
+        shape.GetComponent<ShapeView>().SetRandomColor();
     }
 
     public void OnCubeButton()
@@ -161,5 +164,17 @@ public class ShapeGenerator : MonoBehaviour
         mesh.triangles = triangles;
 
         return mesh;
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector3 worldPoint = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, shape.transform.localPosition.z));
+
+            shape.GetComponent<ShapeController>().MoveTo(
+                worldPoint, 
+                1);
+        }
     }
 }
