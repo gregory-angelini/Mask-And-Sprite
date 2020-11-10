@@ -7,6 +7,7 @@ public class ShapeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
 {
     ShapeView shapeView;
 
+
     void Awake()
     {
         shapeView = GetComponent<ShapeView>();

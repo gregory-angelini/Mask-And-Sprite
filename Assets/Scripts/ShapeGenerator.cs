@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
+using TMPro;
 
 public class ShapeGenerator : MonoBehaviour
 {
+    public enum ShapeId
+    {
+        CUBE,
+        HEXAGON
+    }
+
     [SerializeField] Material shapeMaterial;
     GameObject shape;
     GameObject background;
@@ -15,6 +23,13 @@ public class ShapeGenerator : MonoBehaviour
     [SerializeField] Material shapeMaterialMask;
     [SerializeField] Material backgroundMaterialMask;
     bool isMaskEnabled = false;
+    bool isMovable = false;
+    [SerializeField] Button movableButton;
+    [SerializeField] Button shapeButton;
+    [SerializeField] Button maskButton;
+    ShapeId shapeId = ShapeId.HEXAGON;
+    Color greenButtonColor = new Color(77f / 255f, 243f / 255f, 76f / 255f, 1);
+    Color redButtonColor = new Color(243f / 255f, 77 / 255f, 76f / 255f, 1);
 
 
     void Awake()
@@ -33,9 +48,18 @@ public class ShapeGenerator : MonoBehaviour
         shape.transform.localScale = new Vector3(shapeScale, shapeScale, shapeScale);
         shape.transform.localPosition = new Vector3(0, 0, -1);
 
-        CreateHex();
+        CreateHexagon();
 
         shape.GetComponent<ShapeView>().SetRandomColor();
+
+        UpdateUI();
+    }
+
+    void UpdateUI()
+    {
+        shapeButton.GetComponentInChildren<TextMeshProUGUI>().text = shapeId.ToString();
+        maskButton.image.color = isMaskEnabled ? greenButtonColor : redButtonColor;
+        movableButton.image.color = isMovable ? greenButtonColor : redButtonColor;
     }
 
     void CreateBackground()
@@ -58,6 +82,12 @@ public class ShapeGenerator : MonoBehaviour
         background.layer = LayerMask.NameToLayer("BACKGROUND");
        
         GenerateSquareCollider(background);
+    }
+
+    public void OnMovable()
+    {
+        isMovable = !isMovable;
+        UpdateUI();
     }
 
     public void OnMaskButton()
@@ -88,26 +118,34 @@ public class ShapeGenerator : MonoBehaviour
             shape.GetComponent<ShapeController>().Stop();
             isMaskEnabled = false;
         }
+        UpdateUI();
     }
 
-    public void OnCubeButton()
+    public void OnShapeButton()
     {
-        CreateCube();
-    }
-    public void OnHexButton()
-    {
-        CreateHex();
+        if (shapeId == ShapeId.CUBE)
+        {
+            CreateHexagon();
+        }
+        else if (shapeId == ShapeId.HEXAGON)
+        {
+            CreateCube();
+        }
+        UpdateUI();
     }
 
-    void CreateHex()
+
+    void CreateHexagon()
     {
         shape.GetComponent<MeshFilter>().mesh = GetHexMesh();
         GenerateHexCollider(shape);
+        shapeId = ShapeId.HEXAGON;
     }
     void CreateCube()
     {
         shape.GetComponent<MeshFilter>().mesh = GetCubeMesh();
         GenerateSquareCollider(shape);
+        shapeId = ShapeId.CUBE;
     }
 
     void GenerateSquareCollider(GameObject go)
@@ -264,18 +302,21 @@ public class ShapeGenerator : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (isMovable)
         {
-            RaycastHit2D hit = Physics2D.GetRayIntersection(
-                Camera.main.ScreenPointToRay(Input.mousePosition), 100f, 1 << LayerMask.NameToLayer("BACKGROUND"));
-   
-            if (hit.collider)
+            if (Input.GetMouseButtonDown(0))
             {
-                Vector3 worldPoint = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, shape.transform.localPosition.z));
+                RaycastHit2D hit = Physics2D.GetRayIntersection(
+                    Camera.main.ScreenPointToRay(Input.mousePosition), 100f, 1 << LayerMask.NameToLayer("BACKGROUND"));
 
-                shape.GetComponent<ShapeController>().MoveTo(
-                    worldPoint,
-                    1);
+                if (hit.collider)
+                {
+                    Vector3 worldPoint = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, shape.transform.localPosition.z));
+
+                    shape.GetComponent<ShapeController>().MoveTo(
+                        worldPoint,
+                        1);
+                }
             }
         }
     }
