@@ -21,15 +21,16 @@ public class ShapeController : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
         if (eventData.clickCount == 2)
         {
+            Debug.Log("OnPointerClick");
             shapeView.SetRandomColor();
         }
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log("Enter");
+        //Debug.Log("Enter");
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.Log("Exit");
+        //Debug.Log("Exit");
     }
 }
