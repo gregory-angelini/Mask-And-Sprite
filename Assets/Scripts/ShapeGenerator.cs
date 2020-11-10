@@ -8,8 +8,13 @@ public class ShapeGenerator : MonoBehaviour
 {
     [SerializeField] Material shapeMaterial;
     GameObject shape;
+    GameObject background;
     [SerializeField] float shapeScale = 2f;
     [SerializeField] Material backgroundMaterial;
+
+    [SerializeField] Material shapeMaterialMask;
+    [SerializeField] Material backgroundMaterialMask;
+    bool isMaskEnabled = false;
 
 
     void Awake()
@@ -35,24 +40,54 @@ public class ShapeGenerator : MonoBehaviour
 
     void CreateBackground()
     {
-        GameObject go = new GameObject("Background",
+        background = new GameObject("Background",
             typeof(MeshFilter),
             typeof(MeshRenderer),
             typeof(PolygonCollider2D));
 
-        go.GetComponent<MeshRenderer>().material = backgroundMaterial;
+        background.GetComponent<MeshRenderer>().material = backgroundMaterial;
 
-        var scale = go.transform.localScale;
+        var scale = background.transform.localScale;
         scale.x = scale.y * Camera.main.aspect;
-        go.transform.localScale = scale;
+        background.transform.localScale = scale;
 
-        go.GetComponent<MeshFilter>().mesh = GetBackgroundMesh(
+        background.GetComponent<MeshFilter>().mesh = GetBackgroundMesh(
             10, 
             10);
 
-        go.layer = LayerMask.NameToLayer("BACKGROUND");
+        background.layer = LayerMask.NameToLayer("BACKGROUND");
        
-        GenerateSquareCollider(go);
+        GenerateSquareCollider(background);
+    }
+
+    public void OnMaskButton()
+    {
+        if (!isMaskEnabled)
+        {
+            background.GetComponent<MeshRenderer>().material = backgroundMaterialMask;
+            shape.GetComponent<MeshRenderer>().material = shapeMaterialMask;
+
+            shape.transform.localPosition = new Vector3(
+                shape.transform.localPosition.x, 
+                shape.transform.localPosition.y, 
+                1);
+
+            shape.GetComponent<ShapeController>().Stop();
+            isMaskEnabled = true;
+        }
+        else
+        {
+            background.GetComponent<MeshRenderer>().material = backgroundMaterial;
+            shape.GetComponent<MeshRenderer>().material = shapeMaterial;
+
+            shape.transform.localPosition = new Vector3(
+                shape.transform.localPosition.x, 
+                shape.transform.localPosition.y, 
+                -1);
+
+            shape.GetComponent<ShapeController>().Stop();
+            isMaskEnabled = false;
+        }
     }
 
     public void OnCubeButton()
