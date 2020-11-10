@@ -16,6 +16,8 @@ public class ShapeGenerator : MonoBehaviour
             typeof(MeshFilter), 
             typeof(MeshRenderer), 
             typeof(PolygonCollider2D),
+            typeof(Shape),
+            typeof(ShapeView),
             typeof(ShapeController));
 
         shape.GetComponent<MeshRenderer>().material = material;
@@ -28,7 +30,6 @@ public class ShapeGenerator : MonoBehaviour
     {
         CreateCube();
     }
-
     public void OnHexButton()
     {
         CreateHex();
@@ -121,7 +122,6 @@ public class ShapeGenerator : MonoBehaviour
 
         return mesh;
     }
-
     Vector3 GetHexVertex(Vector3 center, float size, int i)
     {
         var angle_deg = 60 * i + 30;
@@ -133,10 +133,10 @@ public class ShapeGenerator : MonoBehaviour
     {
         Vector3[] vertices = new Vector3[]
         {
-            new Vector3(-0.5f, 0.5f),// top left
-            new Vector3(0.5f, 0.5f),// top right
-            new Vector3(0.5f, -0.5f),// bottom right
-            new Vector3(-0.5f, -0.5f)// bottom left
+            new Vector3(-1f, 1f),// top left
+            new Vector3(1f, 1f),// top right
+            new Vector3(1f, -1f),// bottom right
+            new Vector3(-1f, -1f)// bottom left
         };
 
         Vector2[] uv = new Vector2[]
